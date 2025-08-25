@@ -3,7 +3,7 @@
 $dbHost = "localhost";
 $dbUsername = "root";
 $dbPassword = "";
-$dbName = "blogs_db";
+$dbName = "new_blogs_db";
 
 // Create database connection
 $conn = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);

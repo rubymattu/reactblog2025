@@ -7,7 +7,7 @@ function CreatePost() {
   const [title, setTitle] = React.useState('');
   const [content, setContent] = React.useState('');
   const [author, setAuthor] = React.useState('');
-  const [loading, setIsLoading] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState('');
 
   const navigate = useNavigate();
@@ -33,15 +33,97 @@ function CreatePost() {
     setIsLoading(true);
 
     try {
-
+      const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/create-post.php`, {
+        title,
+        content,
+        author
+      });
+      console.log(response.data);
+      navigate('/');
     } catch (error) {
-
+      console.error('There was an error creating the post!', error);
+      setError('There was an error creating the post. Please try again.');
     }
   } 
 
   return (
-    <div className="container mt-4">
-      <h2>Create a New Post</h2>
+    <div className="container mt-4 p-4 bg-light rounded shadow mt-5 border border-dark">
+      <h2 className="mb-5">Create a New Post</h2>
+      {error && <div className="alert alert-danger">{error}</div>}
+      <form onSubmit={handleSubmit}>
+  {/* Title */}
+  <div className="row mb-3 align-items-center">
+    <label htmlFor="title" className="col-sm-2 col-form-label fw-semibold">
+      Title
+    </label>
+    <div className="col-sm-10">
+      <input
+        type="text"
+        className="form-control w-50"
+        id="title"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Enter post title"
+        required
+      />
+    </div>
+  </div>
+
+  {/* Content */}
+  <div className="row mb-3 align-items-center">
+    <label htmlFor="content" className="col-sm-2 col-form-label fw-semibold">
+      Content
+    </label>
+    <div className="col-sm-10">
+      <textarea
+        type="text"
+        className="form-control w-50"
+        id="content"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder="Enter post content"
+        required
+      />
+    </div>
+  </div>
+
+  {/* Author */}
+  <div className="row mb-3 align-items-center">
+    <label htmlFor="author" className="col-sm-2 col-form-label fw-semibold">
+      Author
+    </label>
+    <div className="col-sm-10">
+      <input
+        type="text"
+        className="form-control w-50"
+        id="author"
+        value={author}
+        onChange={(e) => setAuthor(e.target.value)}
+        placeholder="Enter author name"
+        required
+      />
+    </div>
+  </div>
+
+  {/* Submit Button */}
+  <div className="text-end">
+    <button type="submit" className="btn btn-dark" disabled={isLoading}>
+      {isLoading ? (
+        <span>
+          <span
+            className="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          Creating post...
+        </span>
+      ) : (
+        "Create Post"
+      )}
+    </button>
+  </div>
+</form>
+
     </div>
   );
 }
