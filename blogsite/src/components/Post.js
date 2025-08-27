@@ -18,9 +18,30 @@ const Post = () => {
         }
     };
 
+   const handleVote = async (type) => {
+  try {
+    await axios({
+      method: "post",
+      url: `${process.env.REACT_APP_API_BASE_URL}/vote.php`,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: {
+        post_id: id,
+        vote_type: type,
+      },
+    });
+    // Refresh post after voting
+    fetchPost();
+  } catch (error) {
+    console.error("Error submitting vote:", error);
+  }
+};
+
+
     React.useEffect(() => {
         fetchPost();
-    }, []);
+    });
 
     if (!post) {
         return <div>Loading...</div>;
@@ -36,6 +57,15 @@ const Post = () => {
             </div>
             <hr />
             <p className="mt-5">{post.content}</p>
+
+            <div className="d-flex justify-content-center gap-3">
+              <button className="btn btn-success" onClick={() => handleVote("like")}>
+                <i className="bi bi-hand-thumbs-up"></i> {post.likes} Likes 
+              </button>
+              <button className="btn btn-danger" onClick={() => handleVote("dislike")}>
+                <i className="bi bi-hand-thumbs-down"></i> {post.dislikes} Dislikes
+              </button>
+            </div>
             
         </div>
     );
