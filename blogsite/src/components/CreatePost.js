@@ -47,7 +47,7 @@ function CreatePost() {
   } 
 
   return (
-    <div className="container mt-4 p-4 bg-light rounded shadow mt-5 border border-dark">
+    <div className="container mt-4 p-4 bg-light rounded shadow-lg mt-5 border-0">
       <h2 className="mb-5">Create a New Post</h2>
       {error && <div className="alert alert-danger">{error}</div>}
       <form onSubmit={handleSubmit}>
