@@ -52,6 +52,8 @@ if (!empty($_FILES['image']['name'])) {
     }
 
     $imageName = $originalName;
+} else {
+    $imageName = 'placeholder.jpg';
 }
 // Prepare SQL with imageName column
 $stmt = $conn->prepare('INSERT INTO blog_posts (title, content, author, imageName) VALUES(?, ?, ?, ?)');
