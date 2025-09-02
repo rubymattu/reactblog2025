@@ -10,11 +10,11 @@ const Post = () => {
     const fetchPost = async () => {
         try {
           const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/show-post.php/post/${id}`);
-            const post = response.data.data;
-            setPost(post);
+          const post = response.data.data;
+          setPost(post);
         }
         catch (error) {
-            console.log(error);
+          console.log(error);
         }
     };
 
@@ -57,6 +57,14 @@ const Post = () => {
             </div>
             <hr />
             <p className="mt-5">{post.content}</p>
+            {post.imageName && (
+              <img
+                src={`${process.env.REACT_APP_API_BASE_URL}/uploads/${post.imageName}`}
+                alt={post.author}
+                className="img mb-5"
+                style={{ maxWidth: "150px",  maxHeight: "150px"}}
+              />
+            )}
 
             <div className="d-flex justify-content-center gap-3">
               <button className="btn btn-success" onClick={() => handleVote("like")}>
