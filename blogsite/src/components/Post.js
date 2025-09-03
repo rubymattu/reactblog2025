@@ -9,7 +9,11 @@ const Post = () => {
 
     const fetchPost = async () => {
         try {
-          const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/show-post.php/post/${id}`);
+          const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/show-post.php/post/${id}`,
+            {
+            withCredentials: true
+          }
+          );
           const post = response.data.data;
           setPost(post);
         }

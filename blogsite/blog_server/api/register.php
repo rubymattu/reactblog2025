@@ -1,7 +1,14 @@
 <?php
+  error_reporting(E_ALL);
+  ini_set('display_errors', 1);
   session_start();
+  header("Access-Control-Allow-Origin: http://localhost:3000");  // Or specify your frontend domain
+  header("Access-Control-Allow-Methods: POST, OPTIONS");
+  header("Access-Control-Allow-Headers: Content-Type");
   header("Content-Type: application/json");
-  include "connect.php";
+
+  require_once('../config/config.php');
+  require_once('../config/database.php');;
 
   $data = json_decode(file_get_contents("php://input"), true);
 
@@ -10,12 +17,12 @@
     exit;
   }
 
-  $userName = mysqli_real_escape_string($con, $data['userName']);
-  $emailAddress = mysqli_real_escape_string($con, $data['emailAddress']);
+  $userName = mysqli_real_escape_string($conn, $data['userName']);
+  $emailAddress = mysqli_real_escape_string($conn, $data['emailAddress']);
   $passwordHash = password_hash($data['password'], PASSWORD_BCRYPT);
 
   // Check if username already exists
-  $check = $con->prepare("SELECT registrationID FROM registrations WHERE userName = ?");
+  $check = $conn->prepare("SELECT registrationID FROM registrations WHERE userName = ?");
   $check->bind_param("s", $userName);
   $check->execute();
   $check->store_result();
@@ -27,7 +34,7 @@
   $check->close();
 
   // Insert new user
-  $stmt = $con->prepare("INSERT INTO registrations (userName, password, emailAddress) VALUES (?, ?, ?)");
+  $stmt = $conn->prepare("INSERT INTO registrations (userName, password, emailAddress) VALUES (?, ?, ?)");
   $stmt->bind_param("sss", $userName, $passwordHash, $emailAddress);
 
   if ($stmt->execute()) {
@@ -36,5 +43,5 @@
     echo json_encode(["success" => false, "message" => "Registration failed"]);
   }
   $stmt->close();
-  $con->close();
+  $conn->close();
 ?>

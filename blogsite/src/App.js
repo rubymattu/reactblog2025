@@ -1,23 +1,54 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'; // npm install react-router-dom
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import Login from './components/Login';
+import Register from './components/Register';
 import Navbar from './components/Navbar';
 import CreatePost from './components/CreatePost';
 import Post from './components/Post';
 import PostList from './components/PostList';
- 
+
 function App() {
-  return (
+return (
 <div className="App">
-  <BrowserRouter>
-    <Navbar />
-    <Routes>
-      <Route path={"/"} element={<PostList />} />
-      <Route path={"/create-post"} element={<CreatePost />} />
-      <Route path={"/post/:id"} element={<Post />} />
-    </Routes>
+<BrowserRouter>
+<Navbar/>
+<AuthProvider>
+<Routes>
+{/* Public Routes */}
+
+<Route path="/login" element={<Login />} />
+<Route path="/register" element={<Register />} />
+        {/* Protected Routes */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <PostList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/create-post"
+          element={
+            <ProtectedRoute>
+              <CreatePost />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/post/:id"
+          element={
+            <ProtectedRoute>
+              <Post />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </AuthProvider>
   </BrowserRouter>
 </div>
-  );
+);
 }
- 
 export default App;

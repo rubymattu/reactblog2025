@@ -44,7 +44,8 @@ function CreatePost() {
       const response = await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}/create-post.php`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        { withCredentials: true,
+          headers: { "Content-Type": "multipart/form-data" } }
       );
 
       console.log(response.data);
