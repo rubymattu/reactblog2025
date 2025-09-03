@@ -16,6 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once('../config/config.php');
 require_once('../config/database.php');
 
+require_once 'auth.php';
+
 // Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get raw POST data (JSON)

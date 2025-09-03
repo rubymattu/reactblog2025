@@ -10,6 +10,8 @@ header("Content-Type: application/json");
 require_once('../config/config.php');
 require_once('../config/database.php');
 
+require_once 'auth.php';
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { // handle preflight
     http_response_code(200);
     exit();
