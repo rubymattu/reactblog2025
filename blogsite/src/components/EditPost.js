@@ -1,58 +1,63 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 
-function CreatePost() {
-  const [title, setTitle] = React.useState('');
-  const [content, setContent] = React.useState('');
-  const [author, setAuthor] = React.useState('');
-  const [image, setImage] = React.useState(null); // ✅ Added state for image
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState('');
-
+const EditPost = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
 
-  // Function to handle form validation
-  const validateForm = () => {
-    if (!title.trim() || !content.trim() || !author.trim()) {
-      setError('All fields are required.');
-      return false;
-    }
-    setError('');
-    return true;
-  };
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [author, setAuthor] = useState("");
+  const [image, setImage] = useState(null); // can be string (existing) or File (new)
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_BASE_URL}/show-post.php/post/${id}`,
+          { withCredentials: true }
+        );
+        const post = res.data.data;
+        setTitle(post.title);
+        setContent(post.content);
+        setAuthor(post.author);
+        setImage(post.image); // store existing image URL
+      } catch (err) {
+        setError("Failed to fetch post details.");
+      }
+    };
+    fetchPost();
+  }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-
-    if (!validateForm()) {
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("content", content);
-    formData.append("author", author);
-    if (image) {
-      formData.append("image", image);
-    }
-
+    setError(null);
     setIsLoading(true);
 
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_BASE_URL}/create-post.php`,
+      const formData = new FormData();
+      formData.append("id", id);
+      formData.append("title", title);
+      formData.append("content", content);
+      formData.append("author", author);
+
+      if (image && typeof image !== "string") {
+        // only append if it's a new uploaded file
+        formData.append("image", image);
+      }
+
+      await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/update-post.php`,
         formData,
-        { withCredentials: true,
-          headers: { "Content-Type": "multipart/form-data" } }
+        { withCredentials: true }
       );
 
-      console.log(response.data);
-      navigate('/');
-    } catch (error) {
-      console.error('There was an error creating the post!', error);
-      setError('There was an error creating the post. Please try again.');
+      navigate(`/post/${id}`);
+    } catch (err) {
+      setError("Failed to update post.");
     } finally {
       setIsLoading(false);
     }
@@ -60,8 +65,9 @@ function CreatePost() {
 
   return (
     <div className="container mt-4 p-4 bg-light rounded shadow-lg mt-5 border-0">
-      <h2 className="mb-5">Create a New Post</h2>
+      <h2 className="mb-5">Edit Post</h2>
       {error && <div className="alert alert-danger">{error}</div>}
+
       <form onSubmit={handleSubmit}>
         {/* Title */}
         <div className="row mb-3 align-items-center">
@@ -90,6 +96,7 @@ function CreatePost() {
             <textarea
               className="form-control w-50"
               id="content"
+              rows="5"
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Enter post content"
@@ -119,7 +126,7 @@ function CreatePost() {
         {/* Image Upload */}
         <div className="row mb-3 align-items-center">
           <label htmlFor="image" className="col-sm-2 col-form-label fw-semibold">
-            Author Image
+            Post Image
           </label>
           <div className="col-sm-10">
             <input
@@ -127,11 +134,15 @@ function CreatePost() {
               className="form-control w-50"
               id="image"
               accept="image/*"
-              onChange={(e) => setImage(e.target.files[0])} // Save uploaded file
+              onChange={(e) => setImage(e.target.files[0])}
             />
             {image && (
               <img
-                src={URL.createObjectURL(image)} // Preview uploaded file
+                src={
+                  typeof image === "string"
+                    ? `${process.env.REACT_APP_API_BASE_URL}/uploads/${image}` // backend path
+                    : URL.createObjectURL(image)
+                }
                 alt="Preview"
                 className="img-thumbnail mt-2"
                 style={{ maxWidth: "150px" }}
@@ -140,8 +151,16 @@ function CreatePost() {
           </div>
         </div>
 
+
         {/* Submit Button */}
         <div className="text-end">
+          <button
+            type="button"
+            className="btn btn-secondary me-4"
+            onClick={() => navigate(`/post/${id}`)} // go back to post detail
+          >
+            Cancel
+          </button>
           <button type="submit" className="btn btn-dark" disabled={isLoading}>
             {isLoading ? (
               <span>
@@ -150,16 +169,16 @@ function CreatePost() {
                   role="status"
                   aria-hidden="true"
                 ></span>
-                Creating post...
+                Saving changes...
               </span>
             ) : (
-              "Create Post"
+              "Save Changes"
             )}
           </button>
         </div>
       </form>
     </div>
   );
-}
+};
 
-export default CreatePost;
+export default EditPost;
