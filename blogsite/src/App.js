@@ -13,11 +13,11 @@ function App() {
 return (
 <div className="App">
 <BrowserRouter>
-<Navbar/>
+
   <AuthProvider>
 <Routes>
 {/* Public Routes */}
-
+<Navbar/>
 <Route path="/login" element={<Login />} />
 <Route path="/register" element={<Register />} />
         {/* Protected Routes */}

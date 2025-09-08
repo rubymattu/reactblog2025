@@ -22,13 +22,13 @@
   $passwordHash = password_hash($data['password'], PASSWORD_BCRYPT);
 
   // Check if username already exists
-  $check = $conn->prepare("SELECT registrationID FROM registrations WHERE userName = ?");
-  $check->bind_param("s", $userName);
+  $check = $conn->prepare("SELECT registrationID FROM registrations WHERE userName = ? OR emailAddress = ?");
+  $check->bind_param("ss", $userName, $emailAddress);
   $check->execute();
   $check->store_result();
 
   if ($check->num_rows > 0) {
-    echo json_encode(["success" => false, "message" => "Username already taken"]);
+    echo json_encode(["success" => false, "message" => "Username or Email Already Exists"]);
     exit;
   }
   $check->close();
