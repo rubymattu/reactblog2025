@@ -1,11 +1,54 @@
-import React from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Navbar = () => {
+  const [username, setUsername] = useState("");
   const location = useLocation();
+  const navigate = useNavigate();
+
 
   // Hide links if we are on login or register page
   const hideLinks = location.pathname === "/login" || location.pathname === "/register";
+
+  // Fetch logged-in user info
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_BASE_URL}/checkAuth.php`,
+          { withCredentials: true }
+        );
+
+        if (response.data && response.data.authenticated) {
+          setUsername(response.data.user.userName);
+        } else {
+          navigate("/login");
+        }
+      } catch (error) {
+        console.error("Auth check failed", error);
+        navigate("/login");
+      }
+    };
+
+    fetchUser();
+  }, [navigate]);
+
+  // Logout handler
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/logout.php`,
+        {},
+        { withCredentials: true }
+      );
+    } catch (error) {
+      console.error("Logout failed", error);
+    } finally {
+      navigate("/login");
+    }
+  };
+
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -48,7 +91,18 @@ const Navbar = () => {
                     Create Post
                   </NavLink>
                 </li>
+                              {username && (
+            <li className="nav-item">
+              <span className="navbar-text text-primary me-4">
+                Hii {username}!
+              </span>
+              <button className="btn btn-outline-light" onClick={handleLogout}>
+                Logout
+              </button>
+            </li>
+          )}
               </ul>
+
             </div>
           </>
         )}
