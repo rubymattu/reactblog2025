@@ -1,7 +1,9 @@
 <?php
 
-// Allow from any origin
+session_start();
+
 header("Access-Control-Allow-Origin: http://localhost:3000");
+header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
@@ -11,12 +13,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
+// 🔒 Require authentication
+if (!isset($_SESSION['user'])) {
+    http_response_code(401);
+    echo json_encode(["success" => false, "message" => "Unauthorized"]);
+    exit;
+}
+ 
+
 
 // Load configuration files
 require_once('../config/config.php');
 require_once('../config/database.php');
-
-require_once 'auth.php';
 
 // Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -97,3 +105,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ]);
     exit;
 }
+?>
