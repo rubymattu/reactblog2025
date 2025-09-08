@@ -14,7 +14,7 @@ return (
 <div className="App">
 <BrowserRouter>
 <Navbar/>
-<AuthProvider>
+  <AuthProvider>
 <Routes>
 {/* Public Routes */}
 
