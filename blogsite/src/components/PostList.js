@@ -10,26 +10,44 @@ function PostList() {
   const [totalPosts, setTotalPosts] = useState('0');
   const postsPerPage = 4;
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      setIsLoading(true);
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/posts.php?page=${currentPage}&limit=${postsPerPage}`,
-          {
-            withCredentials: true
-          }
-        );
-        setPosts(response.data.posts);
-        setTotalPosts(response.data.totalPosts);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error fetching posts:', error);
-        setError('There was an error fetching the posts. Please try again later.');
-        setIsLoading(false);
-      }
-    };
+    useEffect(() => {
     fetchPosts();
   }, [currentPage]);
+
+  const fetchPosts = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_BASE_URL}/posts.php?page=${currentPage}`,
+        { withCredentials: true }
+      );
+      setPosts(response.data.posts);
+      setTotalPosts(response.data.totalPosts);
+    } catch (error) {
+      console.error(error);
+      setError("Failed to load posts.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this post?")) return;
+
+    try {
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/delete-post.php`,
+        { id },
+        { withCredentials: true }
+      );
+      console.log(res.data);
+      // refresh list after deletion
+      fetchPosts();
+    } catch (error) {
+      console.error(error);
+      alert("Failed to delete post.");
+    }
+  };
 
     const totalPages = Math.ceil(totalPosts / postsPerPage);
     const goToPreviousPage = () => setCurrentPage(currentPage - 1);
@@ -51,6 +69,12 @@ function PostList() {
                       <p className="card-text">By {post.author} on { new Date(post.publish_date).toLocaleDateString()}</p>
                       <Link to={`/post/${post.id}`} className="btn btn-light text-dark border-dark me-4">Read More</Link>
                       <Link to={`/edit/${post.id}`} className="btn btn-light text-dark border-dark me-4">Edit</Link>
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => handleDelete(post.id)}
+                      >
+                        Delete
+                      </button>
 
                     </div>
                   </div>    
