@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-
+import {useAuth} from "../context/AuthContext";
 function PostList() {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState([true]);
   const [error, setError] = useState('');
   const [currentPage, setCurrentPage] = useState('1');
   const [totalPosts, setTotalPosts] = useState('0');
+  const { user } = useAuth();
+
   const postsPerPage = 4;
 
     useEffect(() => {
@@ -68,13 +70,18 @@ function PostList() {
                       <h5 className="card-title">{post.title}</h5>
                       <p className="card-text">By {post.author} on { new Date(post.publish_date).toLocaleDateString()}</p>
                       <Link to={`/post/${post.id}`} className="btn btn-light text-dark border-dark me-4">Read More</Link>
-                      <Link to={`/edit/${post.id}`} className="btn btn-light text-dark border-dark me-4">Edit</Link>
-                      <button
-                        className="btn btn-danger"
-                        onClick={() => handleDelete(post.id)}
-                      >
-                        Delete
-                      </button>
+                      {user?.role === 'admin' && (
+    <>
+      <Link to={`/edit/${post.id}`} className="btn btn-light text-dark border-dark me-4">Edit</Link>
+      <button
+        className="btn btn-danger"
+        onClick={() => handleDelete(post.id)}
+      >
+        Delete
+      </button>
+    </>
+  )}
+
 
                     </div>
                   </div>    

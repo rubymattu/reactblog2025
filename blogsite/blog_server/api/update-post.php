@@ -10,6 +10,13 @@ header("Content-Type: application/json");
 require_once('../config/config.php');
 require_once('../config/database.php');
 
+  // Only allow admin
+if ($_SESSION['user']['role'] !== 'admin') {
+    http_response_code(403);
+    echo json_encode(["success" => false, "message" => "Forbidden: Admins only"]);
+    exit();
+}
+
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
   http_response_code(200);
