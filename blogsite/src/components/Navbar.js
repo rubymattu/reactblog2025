@@ -7,12 +7,13 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-
-  // Hide links if we are on login or register page
+  // Check if we are on login/register pages
   const hideLinks = location.pathname === "/login" || location.pathname === "/register";
 
-  // Fetch logged-in user info
   useEffect(() => {
+    // Skip auth check on login/register
+    if (hideLinks) return;
+
     const fetchUser = async () => {
       try {
         const response = await axios.get(
@@ -32,9 +33,8 @@ const Navbar = () => {
     };
 
     fetchUser();
-  }, [navigate]);
+  }, [hideLinks, navigate]);
 
-  // Logout handler
   const handleLogout = async () => {
     try {
       await axios.post(
@@ -49,13 +49,13 @@ const Navbar = () => {
     }
   };
 
-
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container">
         <NavLink className="navbar-brand" to="/">
           Blog Application
         </NavLink>
+
         {!hideLinks && (
           <>
             <button
@@ -69,6 +69,7 @@ const Navbar = () => {
             >
               <span className="navbar-toggler-icon"></span>
             </button>
+
             <div className="collapse navbar-collapse" id="navbarNav">
               <ul className="navbar-nav ms-auto mb-2 mb-lg-0 fs-5">
                 <li className="nav-item">
@@ -91,18 +92,17 @@ const Navbar = () => {
                     Create Post
                   </NavLink>
                 </li>
-                              {username && (
-            <li className="nav-item">
-              <span className="navbar-text text-primary me-4">
-                Hii {username}!
-              </span>
-              <button className="btn btn-outline-light" onClick={handleLogout}>
-                Logout
-              </button>
-            </li>
-          )}
+                {username && (
+                  <li className="nav-item d-flex align-items-center">
+                    <span className="navbar-text text-primary me-3">
+                      Hi {username}!
+                    </span>
+                    <button className="btn btn-outline-light" onClick={handleLogout}>
+                      Logout
+                    </button>
+                  </li>
+                )}
               </ul>
-
             </div>
           </>
         )}

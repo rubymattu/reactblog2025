@@ -1,16 +1,25 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 
 function CreatePost() {
   const [title, setTitle] = React.useState('');
   const [content, setContent] = React.useState('');
   const [author, setAuthor] = React.useState('');
-  const [image, setImage] = React.useState(null); // ✅ Added state for image
+  const [image, setImage] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState('');
 
+  const { user } = useContext(AuthContext); // 👈 get logged-in user
   const navigate = useNavigate();
+
+  // Prefill author when user is available
+  useEffect(() => {
+    if (user && user.userName) {
+      setAuthor(user.userName);
+    }
+  }, [user]);
 
   // Function to handle form validation
   const validateForm = () => {
@@ -33,7 +42,7 @@ function CreatePost() {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
-    formData.append("author", author);
+    formData.append("author", author); // 👈 auto-filled
     if (image) {
       formData.append("image", image);
     }
@@ -44,8 +53,10 @@ function CreatePost() {
       const response = await axios.post(
         `${process.env.REACT_APP_API_BASE_URL}/create-post.php`,
         formData,
-        { withCredentials: true,
-          headers: { "Content-Type": "multipart/form-data" } }
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "multipart/form-data" },
+        }
       );
 
       console.log(response.data);
@@ -98,7 +109,7 @@ function CreatePost() {
           </div>
         </div>
 
-        {/* Author */}
+        {/* Author (Auto-filled from logged-in user) */}
         <div className="row mb-3 align-items-center">
           <label htmlFor="author" className="col-sm-2 col-form-label fw-semibold">
             Author
@@ -109,9 +120,7 @@ function CreatePost() {
               className="form-control w-50"
               id="author"
               value={author}
-              onChange={(e) => setAuthor(e.target.value)}
-              placeholder="Enter author name"
-              required
+              readOnly // 👈 make it read-only so user cannot edit
             />
           </div>
         </div>
@@ -119,7 +128,7 @@ function CreatePost() {
         {/* Image Upload */}
         <div className="row mb-3 align-items-center">
           <label htmlFor="image" className="col-sm-2 col-form-label fw-semibold">
-            Author Image
+            Post Image
           </label>
           <div className="col-sm-10">
             <input
@@ -127,11 +136,11 @@ function CreatePost() {
               className="form-control w-50"
               id="image"
               accept="image/*"
-              onChange={(e) => setImage(e.target.files[0])} // Save uploaded file
+              onChange={(e) => setImage(e.target.files[0])}
             />
             {image && (
               <img
-                src={URL.createObjectURL(image)} // Preview uploaded file
+                src={URL.createObjectURL(image)}
                 alt="Preview"
                 className="img-thumbnail mt-2"
                 style={{ maxWidth: "150px" }}

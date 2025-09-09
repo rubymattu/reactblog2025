@@ -7,6 +7,7 @@ function Register() {
   const [userName, setUserName] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ function Register() {
     try {
   const res = await axios.post(
     `${process.env.REACT_APP_API_BASE_URL}/register.php`,
-    { userName, emailAddress, password }
+    { userName, emailAddress, password, role }
   );
   console.log("Response from PHP:", res.data);  // 👀 Add this line
 
@@ -69,6 +70,24 @@ function Register() {
             placeholder="Enter Your Email Address"
             required
           />
+        </div>
+      </div>
+
+      <div className="mb-3 row">
+        <label className="col-sm-4 col-form-label text-end">Role: </label>
+        <div className="col-sm-8">
+           <select
+              id="role"
+              className="form-select"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              required
+            >
+              <option value="">-- Choose a role --</option>
+              <option value="admin">Admin</option>
+              <option value="user">User</option>
+              <option value="guest">Guest</option>
+            </select>
         </div>
       </div>
 

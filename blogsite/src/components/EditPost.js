@@ -157,7 +157,7 @@ const EditPost = () => {
           <button
             type="button"
             className="btn btn-secondary me-4"
-            onClick={() => navigate(`/post/${id}`)} // go back to post detail
+            onClick={() => navigate(`/`)} // go back to post detail
           >
             Cancel
           </button>
