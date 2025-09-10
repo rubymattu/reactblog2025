@@ -8,6 +8,7 @@ function Register() {
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
+  const [secretKey, setSecretKey] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
@@ -18,105 +19,132 @@ function Register() {
     setSuccess("");
 
     try {
-  const res = await axios.post(
-    `${process.env.REACT_APP_API_BASE_URL}/register.php`,
-    { userName, emailAddress, password, role }
-  );
-  console.log("Response from PHP:", res.data);  // 👀 Add this line
+      const res = await axios.post(
+        `${process.env.REACT_APP_API_BASE_URL}/register.php`,
+        { userName, emailAddress, password, role, secretKey } // send extra field
+      );
 
-  if (res.data.success) {
-    setSuccess(res.data.message);
-    setTimeout(() => navigate("/login"), 1500);
-  } else {
-    setError(res.data.message || "Something went wrong");
-  }
-} catch (err) {
-  console.error("Axios error:", err);
-  setError("Registration failed");
-}
+      console.log("Response from PHP:", res.data);
 
+      if (res.data.success) {
+        setSuccess(res.data.message);
+        setTimeout(() => navigate("/login"), 1500);
+      } else {
+        setError(res.data.message || "Something went wrong");
+      }
+    } catch (err) {
+      console.error("Axios error:", err);
+      setError("Registration failed");
+    }
   };
 
   return (
-<div className="container-fluid d-flex justify-content-center align-items-center vh-100">
-  <div className="card shadow p-4  border-0" style={{ maxWidth: "550px", width: "100%" }}>
-    <h3 className="text-center mb-4">Register</h3>
-    {error && <div className="alert alert-danger">{error}</div>}
-    {success && <div className="alert alert-success">{success}</div>}
+    <div className="container-fluid d-flex justify-content-center align-items-center vh-100">
+      <div
+        className="card shadow p-4 border-0"
+        style={{ maxWidth: "550px", width: "100%" }}
+      >
+        <h3 className="text-center mb-4">Register</h3>
+        {error && <div className="alert alert-danger">{error}</div>}
+        {success && <div className="alert alert-success">{success}</div>}
 
-    <form onSubmit={handleSubmit}>
-      <div className="mb-3 row">
-        <label className="col-sm-4 col-form-label text-end">Username:</label>
-        <div className="col-sm-8">
-          <input
-            type="text"
-            className="form-control"
-            value={userName}
-            onChange={(e) => setUserName(e.target.value)}
-            placeholder="Set Your Username"
-            required
-          />
-        </div>
+        <form onSubmit={handleSubmit}>
+          {/* Username */}
+          <div className="mb-3 row">
+            <label className="col-sm-4 col-form-label text-end">Username:</label>
+            <div className="col-sm-8">
+              <input
+                type="text"
+                className="form-control"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                placeholder="Set Your Username"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Email */}
+          <div className="mb-3 row">
+            <label className="col-sm-4 col-form-label text-end">Email:</label>
+            <div className="col-sm-8">
+              <input
+                type="email"
+                className="form-control"
+                value={emailAddress}
+                onChange={(e) => setEmailAddress(e.target.value)}
+                placeholder="Enter Your Email Address"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Role */}
+          <div className="mb-3 row">
+            <label className="col-sm-4 col-form-label text-end">Role:</label>
+            <div className="col-sm-8">
+              <select
+                id="role"
+                className="form-select"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                required
+              >
+                <option value="">-- Choose a role --</option>
+                <option value="admin">Admin</option>
+                <option value="user">User</option>
+                <option value="guest">Guest</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Extra secret password only for admins */}
+          {role === "admin" && (
+            <div className="mb-3 row">
+              <label className="col-sm-4 col-form-label text-end">
+                Admin Secret:
+              </label>
+              <div className="col-sm-8">
+                <input
+                  type="password"
+                  className="form-control"
+                  value={secretKey}
+                  onChange={(e) => setSecretKey(e.target.value)}
+                  placeholder="Enter the secret Admin Password"
+                  required
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Regular password */}
+          <div className="mb-4 row">
+            <label className="col-sm-4 col-form-label text-end">Password:</label>
+            <div className="col-sm-8">
+              <input
+                type="password"
+                className="form-control"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Set Your Password"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Submit */}
+          <div className="d-flex justify-content-center">
+            <button className="btn btn-dark w-50" type="submit">
+              Register
+            </button>
+          </div>
+        </form>
+
+        <p className="mt-3 text-center">
+          Already have an account? <Link to="/login">Login</Link>
+        </p>
       </div>
-
-      <div className="mb-3 row">
-        <label className="col-sm-4 col-form-label text-end">Email:</label>
-        <div className="col-sm-8">
-          <input
-            type="email"
-            className="form-control"
-            value={emailAddress}
-            onChange={(e) => setEmailAddress(e.target.value)}
-            placeholder="Enter Your Email Address"
-            required
-          />
-        </div>
-      </div>
-
-      <div className="mb-3 row">
-        <label className="col-sm-4 col-form-label text-end">Role: </label>
-        <div className="col-sm-8">
-           <select
-              id="role"
-              className="form-select"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              required
-            >
-              <option value="">-- Choose a role --</option>
-              <option value="admin">Admin</option>
-              <option value="user">User</option>
-              <option value="guest">Guest</option>
-            </select>
-        </div>
-      </div>
-
-      <div className="mb-4 row">
-        <label className="col-sm-4 col-form-label text-end">Password:</label>
-        <div className="col-sm-8">
-          <input
-            type="password"
-            className="form-control"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Set Your Password"
-            required
-          />
-        </div>
-      </div>
-
-      <div className="d-flex justify-content-center">
-        <button className="btn btn-dark w-50" type="submit">
-          Register
-        </button>
-      </div>
-    </form>
-
-    <p className="mt-3 text-center">
-      Already have an account? <Link to="/login">Login</Link>
-    </p>
-  </div>
-</div>
+    </div>
   );
 }
 
