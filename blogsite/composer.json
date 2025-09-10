@@ -1,0 +1,12 @@
+{
+    "name": "raveenamattu/blogsite",
+    "description": "classproject",
+    "autoload": {
+        "psr-4": {
+            "Raveenamattu\\Blogsite\\": "src/"
+        }
+    },
+    "require": {
+        "vlucas/phpdotenv": "^5.6"
+    }
+}

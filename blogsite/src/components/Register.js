@@ -12,6 +12,7 @@ function Register() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const navigate = useNavigate();
+  const payload = { userName, emailAddress, password, role };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
